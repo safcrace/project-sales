@@ -11,6 +11,11 @@ use App\Photo;
 
 class FlyersController extends Controller
 {
+    public function __construct () {
+        $this->middleware('auth');
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -58,9 +63,18 @@ class FlyersController extends Controller
     public function show($zip, $street)
     {
         $flyer = Flyer::locatedAt($zip,$street);
+        //dd($flyer->photos);
         return view('flyers.show', compact('flyer'));
     }
 
+
+    /**
+     * Apply a photo to the referenced flyer.
+     * @method addPhoto
+     * @param  [type]   $zip     [description]
+     * @param  [type]   $street  [description]
+     * @param  Request  $request [description]
+     */
     public function addPhoto ($zip, $street, Request $request)
     {
         $this->validate($request, [
@@ -68,9 +82,7 @@ class FlyersController extends Controller
         ]);
 
         $photo = Photo::fromForm($request->file('photo'));
-        $flyer = Flyer::locatedAt($zip,$street)->addPhoto($photo);
-        //$flyer->photos()->create(['path' => "/flyers/photos/{$name}"]);
-        //return 'Done';
+        Flyer::locatedAt($zip,$street)->addPhoto($photo);
     }
 
     /**
